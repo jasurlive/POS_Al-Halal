@@ -35,14 +35,11 @@ class POSHandler:
                 0, df.at[index[0], "Inventory Quantity"] - 1
             )
 
-            # Clear existing sheet and write updated dataframe
-            for row in dataframe_to_rows(df, index=False, header=True):
-                sheet.append(row)
-
-            # Preserve column widths and other formatting
+            # Preserve the original column widths
+            original_column_widths = {}
             for col in sheet.columns:
-                max_length = 0
                 column = col[0].column_letter  # Get the column name
+                max_length = 0
                 for cell in col:
                     try:
                         if len(str(cell.value)) > max_length:
@@ -50,6 +47,22 @@ class POSHandler:
                     except:
                         pass
                 adjusted_width = max_length + 2
-                sheet.column_dimensions[column].width = adjusted_width
+                original_column_widths[column] = adjusted_width
+
+            # Clear all existing rows except for the header
+            for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row):
+                for cell in row:
+                    cell.value = None  # Clear the cell value
+
+            # Write the updated dataframe back to the sheet
+            for r_idx, row in enumerate(
+                dataframe_to_rows(df, index=False, header=True), 2
+            ):
+                for c_idx, value in enumerate(row, 1):
+                    sheet.cell(row=r_idx, column=c_idx, value=value)
+
+            # Restore column widths
+            for col_letter, width in original_column_widths.items():
+                sheet.column_dimensions[col_letter].width = width
 
             wb.save(self.file_path)
