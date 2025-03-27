@@ -2,7 +2,6 @@ import pandas as pd
 import os
 from datetime import datetime
 import openpyxl
-from openpyxl.utils.dataframe import dataframe_to_rows
 
 
 class POSHandler:
@@ -25,44 +24,26 @@ class POSHandler:
         wb = openpyxl.load_workbook(self.file_path)
         sheet = wb.active
 
-        # Read data into pandas dataframe
-        df = pd.read_excel(self.file_path, engine="openpyxl")
+        # Extract the header row and map column names to indexes
+        header = [cell.value for cell in sheet[1]]
+        item_name_col = header.index(
+            "Item Name"
+        )  # Find the column index for "Item Name"
+        inventory_col = header.index(
+            "Inventory Quantity"
+        )  # Find the column index for "Inventory Quantity"
 
-        # Find the index of the item to update
-        index = df[df["Item Name"] == item_name].index
-        if not index.empty:
-            df.at[index[0], "Inventory Quantity"] = max(
-                0, df.at[index[0], "Inventory Quantity"] - 1
-            )
+        # Iterate over the rows to find the item by its name
+        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row):
+            if row[item_name_col].value == item_name:  # Match the item name
+                inventory_cell = row[
+                    inventory_col
+                ]  # Reference the "Inventory Quantity" cell
+                if inventory_cell.value is not None:
+                    inventory_cell.value = max(
+                        0, inventory_cell.value - 1
+                    )  # Decrease inventory
+                break
 
-            # Preserve the original column widths
-            original_column_widths = {}
-            for col in sheet.columns:
-                column = col[0].column_letter  # Get the column name
-                max_length = 0
-                for cell in col:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(cell.value)
-                    except:
-                        pass
-                adjusted_width = max_length + 2
-                original_column_widths[column] = adjusted_width
-
-            # Clear all existing rows except for the header
-            for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row):
-                for cell in row:
-                    cell.value = None  # Clear the cell value
-
-            # Write the updated dataframe back to the sheet
-            for r_idx, row in enumerate(
-                dataframe_to_rows(df, index=False, header=True), 2
-            ):
-                for c_idx, value in enumerate(row, 1):
-                    sheet.cell(row=r_idx, column=c_idx, value=value)
-
-            # Restore column widths
-            for col_letter, width in original_column_widths.items():
-                sheet.column_dimensions[col_letter].width = width
-
-            wb.save(self.file_path)
+        # Save the workbook with the updated inventory
+        wb.save(self.file_path)
