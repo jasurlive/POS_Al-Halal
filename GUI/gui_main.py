@@ -59,3 +59,16 @@ class MainApp(QWidget):
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+
+        # Set default focus on POS tab's barcode input
+        self.pos_widget.focus_barcode_input()
+
+        # Connect tab change event to focus logic
+        self.tabs.currentChanged.connect(self.handle_tab_change)
+
+    def handle_tab_change(self, index):
+        """Handle tab change to set focus on the appropriate barcode input."""
+        if index == 0:  # POS tab
+            self.pos_widget.focus_barcode_input()
+        elif index == 1:  # Inventory tab
+            self.inventory_widget.focus_barcode_input()

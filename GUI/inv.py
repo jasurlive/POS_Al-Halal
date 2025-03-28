@@ -60,3 +60,7 @@ class InventoryWidget(QWidget):
             self.sale_price_input.text(),
             self.inventory_quantity_input.text(),
         )
+
+    def focus_barcode_input(self):
+        """Set focus on the barcode input field."""
+        self.barcode_input.setFocus()

@@ -68,10 +68,9 @@ class POSWidget(QWidget):
         self.scanned_items = []
         self.total_price = 0.0
 
-        # Auto-focus
-        self.focus_timer = QTimer(self)
-        self.focus_timer.timeout.connect(lambda: self.scanner_input.setFocus())
-        self.focus_timer.start(500)
+    def focus_barcode_input(self):
+        """Set focus on the barcode input field."""
+        self.scanner_input.setFocus()
 
     def scan_item(self):
         barcode = self.scanner_input.text()
@@ -95,3 +94,4 @@ class POSWidget(QWidget):
         self.scanned_items = []
         self.total_price = 0.0
         self.total_price_label.setText("Total Price: $0.00")
+        self.focus_barcode_input()  # Set focus back to the barcode input field
