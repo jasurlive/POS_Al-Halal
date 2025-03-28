@@ -1,8 +1,8 @@
 import sys
 import qtawesome as qta
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QPushButton
 from PyQt6.QtGui import QPalette, QColor, QIcon, QCursor
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from GUI.POS import POSWidget
 from GUI.inv import InventoryWidget
 
@@ -28,6 +28,7 @@ class MainApp(QWidget):
 
         # Create Tabs
         self.tabs = QTabWidget(self)
+        self.tabs.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         # Add POS and Inventory tabs
         self.pos_widget = POSWidget()
@@ -38,25 +39,25 @@ class MainApp(QWidget):
         )
         self.tabs.addTab(self.inventory_widget, qta.icon("fa5s.box-open"), " Inventory")
 
-        # Add Refresh Tab (Dummy Empty Widget)
-        self.refresh_tab = QWidget()  # Empty widget since we just need the tab itself
-        self.tabs.addTab(
-            self.refresh_tab,
-            qta.icon("fa5s.paint-brush"),
-            " Clear",
-        )
-        self.tabs.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        # Replace Clear Tab with a Button Styled as a Tab
+        self.clear_button = QPushButton(" Clear")
+        self.clear_button.setIcon(qta.icon("fa5s.paint-brush"))
+        self.clear_button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.clear_button.clicked.connect(self.handle_clear_click)
 
-        # Styling for Tabs
+        # Add Clear Button as a Fake Tab
+        self.tabs.setCornerWidget(self.clear_button, Qt.Corner.TopRightCorner)
+
+        # Styling for Tabs and Clear Button
         self.tabs.setStyleSheet(
             """
             QTabWidget::pane {
-                border: 2px solid #ccc;
+                border: 1px solid #ccc;
                 background-color: #ffffff;
                 padding: 10px;
                 border-radius: 10px;
             }
-            QTabBar::tab {
+            QTabBar::tab, QPushButton {
                 background: #007bff;
                 color: white;
                 padding: 10px;
@@ -70,7 +71,7 @@ class MainApp(QWidget):
             QTabBar::tab:selected {
                 background: #00b365;
             }
-            QTabBar::tab:hover {
+            QTabBar::tab:hover, QPushButton:hover {
                 background: #0056b3;
                 border: 1px solid #6effd3;
                 color: #e9ecef;
@@ -84,24 +85,31 @@ class MainApp(QWidget):
         # Set default focus on POS tab's barcode input
         self.pos_widget.focus_barcode_input()
 
-        # Connect tab change event to override refresh tab behavior
-        self.tabs.currentChanged.connect(self.handle_tab_change)
-
         self.previous_tab_index = 0  # Track the previously active tab index
 
-    def handle_tab_change(self, index):
-        """Handle tab change. If Refresh tab is clicked, refresh inputs and stay on the current tab."""
-        if index == 2:  # Refresh tab
-            self.clear_inputs()
-            self.tabs.setCurrentIndex(
-                self.previous_tab_index
-            )  # Return to the previous tab
-        else:
-            self.previous_tab_index = index  # Update the previous tab index
-            if index == 0:  # POS tab
-                self.pos_widget.focus_barcode_input()
-            elif index == 1:  # Inventory tab
-                self.inventory_widget.focus_barcode_input()
+    def handle_clear_click(self):
+        """Change the button text and icon on click, then revert after a delay."""
+        self.clear_button.setText(" Cleared!")
+        self.clear_button.setIcon(qta.icon("fa5s.check-circle"))
+
+        QTimer.singleShot(2000, self.reset_clear_button)  # Reset after 2 seconds
+
+        # Track the currently active tab
+        active_tab = self.tabs.currentIndex()
+
+        # Perform clearing action
+        self.clear_inputs()
+
+        # Refocus the barcode input based on the active tab
+        if active_tab == 0:  # POS tab
+            self.pos_widget.focus_barcode_input()
+        elif active_tab == 1:  # Inventory tab
+            self.inventory_widget.focus_barcode_input()
+
+    def reset_clear_button(self):
+        """Reset the button back to original state."""
+        self.clear_button.setText(" Clear")
+        self.clear_button.setIcon(qta.icon("fa5s.paint-brush"))
 
     def clear_inputs(self):
         """Clear all input fields in POS and Inventory tabs."""
