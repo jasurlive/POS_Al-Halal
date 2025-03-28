@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QListWidget,
 )
-from PyQt6.QtGui import QFont, QPalette, QColor, QIcon
+from PyQt6.QtGui import QFont, QPalette, QColor, QIcon, QPixmap
 from PyQt6.QtCore import QTimer
 from pos import POSHandler
 from inventory import InventoryHandler
@@ -29,6 +29,12 @@ class POSApp(QWidget):
             QPalette.ColorRole.Window, QColor("#f8f9fa")
         )  # Light background
         self.setPalette(palette)
+
+        # Set QtAwesome icon as window icon
+        icon_pixmap = qta.icon("fa5s.shopping-cart").pixmap(
+            64, 64
+        )  # Convert QtAwesome icon to QPixmap
+        self.setWindowIcon(QIcon(icon_pixmap))  # Set as window icon
 
         self.layout = QVBoxLayout()
         self.tabs = QTabWidget(self)
@@ -90,7 +96,7 @@ class POSApp(QWidget):
             """
             font-size: 14px;
             padding: 10px;
-            background-color: #ffffff;
+            background-color: #ffffff;j
             color: #333;
             border: 1px solid #ccc;
             border-radius: 5px;
