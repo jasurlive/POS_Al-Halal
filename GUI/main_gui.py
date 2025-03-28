@@ -76,6 +76,7 @@ class MainApp(QWidget):
             }
             QTabBar::tab:selected {
                 background: #00b365;
+                border: 1px solid #ffffff;
             }
             QTabBar::tab:hover, #clearButton:hover {
                 background: #0056b3;

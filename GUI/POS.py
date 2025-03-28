@@ -54,9 +54,12 @@ class POSWidget(QWidget):
 
         self.layout.addWidget(self.scroll_area)
 
-        self.total_price_label = QLabel("Total Price: 0.00 KRW", self)
+        self.total_price_label = QLabel("Total: 0.00 KRW", self)
         self.total_price_label.setFont(QFont("Arial", 16))
-        self.total_price_label.setStyleSheet("color: #28a745; font-weight: bold;")
+        self.total_price_label.setStyleSheet(
+            "color: #1a3a7f; font-weight: bold; background-color: #f5f8fa; border: 1px solid #ddd; border-radius: 8px; padding: 10px;"
+        )
+        self.total_price_label.setFixedHeight(50)
         self.total_price_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.total_price_label)
 
@@ -193,7 +196,7 @@ class POSWidget(QWidget):
         self.total_price = sum(
             item["quantity"] * item["price"] for item in self.scanned_items.values()
         )
-        self.total_price_label.setText(f"Total Price: {self.total_price:.2f} KRW")
+        self.total_price_label.setText(f"Total: {self.total_price:.2f} KRW")
 
     def process_sale(self):
         if not self.scanned_items:
@@ -229,4 +232,4 @@ class POSWidget(QWidget):
             if widget:
                 widget.deleteLater()
         self.scanned_items.clear()
-        self.total_price_label.setText("Total Price: 0.00 KRW")
+        self.total_price_label.setText("Total: 0.00 KRW")
