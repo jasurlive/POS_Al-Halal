@@ -21,7 +21,7 @@ class POSApp(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("POS and Inventory App")
+        self.setWindowTitle("POS Al Halal")
         self.setGeometry(100, 100, 700, 500)
 
         palette = self.palette()
@@ -70,6 +70,13 @@ class POSApp(QWidget):
         self.sell_button.clicked.connect(self.process_sale)
         self.pos_layout.addWidget(self.sell_button)
 
+        self.barcode_input = QLineEdit(self)
+        self.barcode_input.setPlaceholderText("Barcode")
+        self.barcode_input.setStyleSheet(
+            "padding: 10px; border: 2px solid #17a2b8; border-radius: 5px;"
+        )
+        self.inventory_layout.addWidget(self.barcode_input)
+
         self.item_name_input = QLineEdit(self)
         self.item_name_input.setPlaceholderText("Item Name")
         self.item_name_input.setStyleSheet(
@@ -114,8 +121,20 @@ class POSApp(QWidget):
         self.total_price = 0.0
 
         self.focus_timer = QTimer(self)
-        self.focus_timer.timeout.connect(lambda: self.scanner_input.setFocus())
+        self.focus_timer.timeout.connect(self.manage_focus)
         self.focus_timer.start(500)
+        self.barcode_focused_once = False  # Track if barcode input has been focused
+
+    def manage_focus(self):
+        if self.tabs.currentWidget() == self.pos_tab:
+            self.scanner_input.setFocus()
+        elif (
+            self.tabs.currentWidget() == self.inventory_tab
+            and not self.barcode_focused_once
+        ):
+            self.barcode_input.setFocus()
+            if self.barcode_input.text():  # Stop focusing if barcode input is filled
+                self.barcode_focused_once = True
 
     def scan_item(self):
         barcode = self.scanner_input.text()
@@ -144,6 +163,7 @@ class POSApp(QWidget):
     def add_inventory_item(self):
         self.inventory_handler.add_inventory_item(
             self.item_name_input.text(),
+            self.barcode_input.text(),
             self.original_price_input.text(),
             self.sale_price_input.text(),
             self.inventory_quantity_input.text(),
