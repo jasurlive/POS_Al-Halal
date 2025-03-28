@@ -111,7 +111,7 @@ class POSWidget(QWidget):
         self.set_button_style("Success!", "fa5s.check-circle", "#2564b6")
 
         # Revert button back to sell state after 3 seconds
-        QTimer.singleShot(3000, self.reset_sell_button)
+        QTimer.singleShot(2000, self.reset_sell_button)
         self.focus_barcode_input()  # Set focus back to the barcode input field
 
     def reset_sell_button(self):
