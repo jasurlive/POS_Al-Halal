@@ -21,7 +21,7 @@ class POSWidget(QWidget):
 
         # Scanner Input
         self.scanner_input = QLineEdit(self)
-        self.scanner_input.setPlaceholderText("Scan Item ID Here...")
+        self.scanner_input.setPlaceholderText("Scan Barcode Here...")
         self.scanner_input.setStyleSheet(
             """
             font-size: 18px;
@@ -94,4 +94,22 @@ class POSWidget(QWidget):
         self.scanned_items = []
         self.total_price = 0.0
         self.total_price_label.setText("Total Price: $0.00")
+
+        # Change button to success state
+        self.sell_button.setText("Success!")
+        self.sell_button.setIcon(qta.icon("fa5s.check-circle"))  # Success icon
+        self.sell_button.setStyleSheet(
+            "background-color: #2564b6; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
+        )
+
+        # Revert button back to sell state after 3 seconds
+        QTimer.singleShot(3000, self.reset_sell_button)
         self.focus_barcode_input()  # Set focus back to the barcode input field
+
+    def reset_sell_button(self):
+        """Reset the sell button to its original state."""
+        self.sell_button.setText(" Sell all!")
+        self.sell_button.setIcon(qta.icon("fa5s.money-bill-wave"))  # Original icon
+        self.sell_button.setStyleSheet(
+            "background-color: #269e62; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
+        )
