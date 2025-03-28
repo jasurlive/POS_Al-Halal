@@ -51,6 +51,22 @@ class InventoryHandler:
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"Excel file not found: {self.file_path}")
 
+        # Validate and sanitize inputs
+        barcode = str(barcode).strip()
+        item_name = str(item_name).strip()
+        try:
+            original_price = float(original_price)
+        except ValueError:
+            raise ValueError("Original Price must be a valid number.")
+        try:
+            sale_price = float(sale_price)
+        except ValueError:
+            raise ValueError("Sale Price must be a valid number.")
+        try:
+            inventory_quantity = int(inventory_quantity)
+        except ValueError:
+            raise ValueError("Inventory Quantity must be a valid integer.")
+
         wb = load_workbook(self.file_path)
         ws = wb.active
 
@@ -60,7 +76,7 @@ class InventoryHandler:
         # Check if the barcode already exists
         existing_row = None
         for row in range(2, ws.max_row + 1):  # Start from row 2 (skip headers)
-            if str(ws.cell(row=row, column=columns["Barcode"]).value) == str(barcode):
+            if str(ws.cell(row=row, column=columns["Barcode"]).value) == barcode:
                 existing_row = row
                 break
 
@@ -73,23 +89,11 @@ class InventoryHandler:
 
         # Prepare data to insert
         data = {
-            "Barcode": str(barcode),  # Ensure barcode is saved as a string
+            "Barcode": barcode,
             "Item Name": item_name,
-            "Inventory Quantity": (
-                int(inventory_quantity)
-                if inventory_quantity.isdigit()
-                else inventory_quantity
-            ),
-            "Original Price": (
-                float(original_price)
-                if original_price.replace(".", "", 1).isdigit()
-                else original_price
-            ),
-            "Sale Price": (
-                float(sale_price)
-                if sale_price.replace(".", "", 1).isdigit()
-                else sale_price
-            ),
+            "Inventory Quantity": inventory_quantity,
+            "Original Price": original_price,
+            "Sale Price": sale_price,
         }
 
         # Insert or update data into the correct columns dynamically

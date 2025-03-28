@@ -20,30 +20,46 @@ class POSHandler:
         return item.iloc[0].to_dict() if not item.empty else None
 
     def update_inventory(self, item_name):
-        # Load the workbook with openpyxl to keep the formatting
+        """Update the inventory by reducing the quantity of the sold item."""
+        if not os.path.exists(self.file_path):
+            raise FileNotFoundError(f"Excel file not found: {self.file_path}")
+
         wb = openpyxl.load_workbook(self.file_path)
-        sheet = wb.active
+        ws = wb.active
 
-        # Extract the header row and map column names to indexes
-        header = [cell.value for cell in sheet[1]]
-        item_name_col = header.index(
-            "Item Name"
-        )  # Find the column index for "Item Name"
-        inventory_col = header.index(
-            "Inventory Quantity"
-        )  # Find the column index for "Inventory Quantity"
+        # Get column indexes dynamically
+        columns = self.get_column_indexes(ws)
 
-        # Iterate over the rows to find the item by its name
-        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row):
-            if row[item_name_col].value == item_name:  # Match the item name
-                inventory_cell = row[
-                    inventory_col
-                ]  # Reference the "Inventory Quantity" cell
-                if inventory_cell.value is not None:
-                    inventory_cell.value = max(
-                        0, inventory_cell.value - 1
-                    )  # Decrease inventory
+        # Search for the item in the "Item Name" column
+        for row in range(2, ws.max_row + 1):  # Start from row 2 (skip headers)
+            if ws.cell(row=row, column=columns["Item Name"]).value == item_name:
+                inventory_cell = ws.cell(row=row, column=columns["Inventory Quantity"])
+                # Ensure inventory value is numeric
+                try:
+                    current_quantity = int(inventory_cell.value)
+                except (ValueError, TypeError):
+                    current_quantity = 0
+                inventory_cell.value = max(0, current_quantity - 1)
                 break
 
-        # Save the workbook with the updated inventory
+        # Save workbook
         wb.save(self.file_path)
+
+    def get_column_indexes(self, ws):
+        """Find column indexes based on header names."""
+        headers = {
+            ws.cell(row=1, column=col).value: col for col in range(1, ws.max_column + 1)
+        }
+        required_columns = [
+            "Barcode",
+            "Item Name",
+            "Inventory Quantity",
+            "Original Price",
+            "Sale Price",
+        ]
+
+        missing_columns = [col for col in required_columns if col not in headers]
+        if missing_columns:
+            raise ValueError(f"Missing required columns in Excel: {missing_columns}")
+
+        return {col: headers[col] for col in required_columns}
