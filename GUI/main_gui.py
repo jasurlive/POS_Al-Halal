@@ -1,6 +1,6 @@
 import sys
 import qtawesome as qta
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QPushButton, QHBoxLayout
 from PyQt6.QtGui import QPalette, QColor, QIcon, QCursor
 from PyQt6.QtCore import Qt, QTimer
 from GUI.POS import POSWidget
@@ -41,6 +41,7 @@ class MainApp(QWidget):
 
         # Replace Clear Tab with a Button Styled as a Tab
         self.clear_button = QPushButton(" Clear")
+        self.clear_button.setObjectName("clearButton")
         self.clear_button.setIcon(qta.icon("fa5s.paint-brush"))
         self.clear_button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.clear_button.clicked.connect(self.handle_clear_click)
@@ -57,7 +58,7 @@ class MainApp(QWidget):
                 padding: 10px;
                 border-radius: 10px;
             }
-            QTabBar::tab, QPushButton {
+            QTabBar::tab, #clearButton {
                 background: #007bff;
                 color: white;
                 padding: 10px;
@@ -71,7 +72,7 @@ class MainApp(QWidget):
             QTabBar::tab:selected {
                 background: #00b365;
             }
-            QTabBar::tab:hover, QPushButton:hover {
+            QTabBar::tab:hover, #clearButton:hover {
                 background: #0056b3;
                 border: 1px solid #6effd3;
                 color: #e9ecef;
