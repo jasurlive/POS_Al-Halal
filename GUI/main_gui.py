@@ -16,7 +16,7 @@ class MainApp(QWidget):
 
         # Set application-wide palette
         palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor("#f8f9fa"))
+        palette.setColor(QPalette.ColorRole.Window, QColor("#fffdee"))
         self.setPalette(palette)
 
         # Set QtAwesome icon as window icon
@@ -35,9 +35,9 @@ class MainApp(QWidget):
         self.inventory_widget = InventoryWidget()
 
         self.tabs.addTab(
-            self.pos_widget, qta.icon("fa5s.shopping-cart"), " Point of Sale"
+            self.pos_widget, qta.icon("fa5s.shopping-cart"), "Point of Sale"
         )
-        self.tabs.addTab(self.inventory_widget, qta.icon("fa5s.box-open"), " Inventory")
+        self.tabs.addTab(self.inventory_widget, qta.icon("fa5s.box-open"), "Inventory")
 
         # Replace Clear Tab with a Button Styled as a Tab
         self.clear_button = QPushButton(" Clear")
@@ -54,19 +54,24 @@ class MainApp(QWidget):
             """
             QTabWidget::pane {
                 border: 1px solid #ccc;
-                background-color: #ffffff;
+                background-color: #e8ffec;
                 padding: 10px;
                 border-radius: 10px;
+                alignment: center;
             }
+             QTabBar {
+                border: 1px solid #cccccc;
+                border-radius: 8px;
+    }
             QTabBar::tab, #clearButton {
                 background: #007bff;
                 color: white;
-                padding: 10px;
-                font-size: 16px;
+                height: 50px;
+                font-size: 18px;
                 border: 1px solid #007bff;
                 margin: 5px;
                 border-radius: 5px;
-                width: 120px;
+                width: 150px;
                 margin: auto;
             }
             QTabBar::tab:selected {

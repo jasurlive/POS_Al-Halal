@@ -61,14 +61,30 @@ class POSWidget(QWidget):
         self.layout.addWidget(self.total_price_label)
 
         self.sell_button = QPushButton(" Sell", self)
+        self.sell_button.setObjectName("sellButton")
         self.sell_button.setIcon(qta.icon("fa5s.money-bill-wave"))
-        self.sell_button.setStyleSheet(
-            "background-color: #2e9e26; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
-        )
         self.sell_button.clicked.connect(self.process_sale)
         self.layout.addWidget(self.sell_button)
 
         self.scanned_items = {}
+
+        self.setStyleSheet(
+            """
+            QPushButton#sellButton {
+                background-color: #25a21c;
+                color: white;
+                padding: 12px;
+                font-size: 25px;
+                font-weight: bold;
+                height: 50px;
+                border-radius: 5px;
+                border: none;
+            }
+            QPushButton#sellButton[success="true"] {
+                background-color: #2564b6;
+            }
+            """
+        )
 
     def focus_barcode_input(self):
         self.scanner_input.setFocus()
@@ -179,13 +195,6 @@ class POSWidget(QWidget):
         )
         self.total_price_label.setText(f"Total Price: {self.total_price:.2f} KRW")
 
-    def set_button_style(self, text, icon_name, background_color):
-        self.sell_button.setText(text)
-        self.sell_button.setIcon(qta.icon(icon_name))
-        self.sell_button.setStyleSheet(
-            f"background-color: {background_color}; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
-        )
-
     def process_sale(self):
         if not self.scanned_items:
             error_label = QLabel("No items to sell. Add items first!", self)
@@ -197,24 +206,23 @@ class POSWidget(QWidget):
             for _ in range(item_data["quantity"]):
                 self.pos_handler.update_inventory(item_name)
 
-        while self.scanned_items_list.count():
-            widget = self.scanned_items_list.takeAt(0).widget()
-            if widget:
-                widget.deleteLater()
+        self.clear_inputs()
 
-        self.scanned_items.clear()
-        self.total_price_label.setText("Total Price: 0.00 KRW")
-
-        self.set_button_style("Success!", "fa5s.check-circle", "#2564b6")
+        self.sell_button.setText("Success!")
+        self.sell_button.setIcon(qta.icon("fa5s.check-circle"))
+        self.sell_button.setProperty("success", True)
+        self.style().polish(self.sell_button)
 
         QTimer.singleShot(2000, self.reset_sell_button)
         self.focus_barcode_input()
 
     def reset_sell_button(self):
-        self.set_button_style(" Sell", "fa5s.money-bill-wave", "#2e9e26")
+        self.sell_button.setText(" Sell")
+        self.sell_button.setIcon(qta.icon("fa5s.money-bill-wave"))
+        self.sell_button.setProperty("success", False)
+        self.style().polish(self.sell_button)
 
     def clear_inputs(self):
-        """Clear all input fields and reset scanned items."""
         self.scanner_input.clear()
         while self.scanned_items_list.count():
             widget = self.scanned_items_list.takeAt(0).widget()

@@ -11,9 +11,10 @@ class InventoryWidget(QWidget):
         self.inventory_handler = InventoryHandler()
 
         input_style = """
-            padding: 10px;
+            padding: 15px;
             border: 2px solid #17a2b8;
             border-radius: 5px;
+            font-size: 18px;
             background-color: #ffffff;
             color: #333;
         """
@@ -50,7 +51,7 @@ class InventoryWidget(QWidget):
         self.add_inventory_button = QPushButton(" Add New Item", self)
         self.add_inventory_button.setIcon(qta.icon("fa5s.plus-circle"))
         self.add_inventory_button.setStyleSheet(
-            "background-color: #ffc107; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
+            "background-color: #008666; color: white; padding: 20px; font-size: 18px; border-radius: 5px; border: none;"
         )
         self.add_inventory_button.clicked.connect(self.add_inventory_item)
         self.layout.addWidget(self.add_inventory_button)
