@@ -1,7 +1,7 @@
 import sys
 import qtawesome as qta
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
-from PyQt6.QtGui import QPalette, QColor, QIcon
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QHBoxLayout
+from PyQt6.QtGui import QPalette, QColor, QIcon, QCursor
 from PyQt6.QtCore import Qt
 from GUI.POS import POSWidget
 from GUI.inv import InventoryWidget
@@ -40,26 +40,39 @@ class MainApp(QWidget):
 
         # Add Refresh Tab (Dummy Empty Widget)
         self.refresh_tab = QWidget()  # Empty widget since we just need the tab itself
-        self.tabs.addTab(self.refresh_tab, qta.icon("fa5s.sync-alt"), " Refresh")
+        self.tabs.addTab(
+            self.refresh_tab,
+            qta.icon("fa5s.paint-brush"),
+            " Clear",
+        )
+        self.tabs.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         # Styling for Tabs
         self.tabs.setStyleSheet(
             """
             QTabWidget::pane {
-                border: 1px solid #ccc;
+                border: 2px solid #ccc;
                 background-color: #ffffff;
+                padding: 10px;
+                border-radius: 10px;
             }
             QTabBar::tab {
                 background: #007bff;
                 color: white;
                 padding: 10px;
+                font-size: 16px;
+                border: 1px solid #007bff;
+                margin: 5px;
                 border-radius: 5px;
+                width: 120px;
+                margin: auto;
             }
             QTabBar::tab:selected {
-                background: #0056b3;
+                background: #00b365;
             }
             QTabBar::tab:hover {
                 background: #0056b3;
+                border: 1px solid #6effd3;
                 color: #e9ecef;
             }
         """

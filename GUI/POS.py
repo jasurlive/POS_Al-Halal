@@ -47,7 +47,7 @@ class POSWidget(QWidget):
         self.scanned_items_list.setContentsMargins(0, 0, 0, 0)
 
         self.scroll_area.setWidget(self.list_container)
-        self.scroll_area.setFixedHeight(250)
+        self.scroll_area.setFixedHeight(300)
         self.scroll_area.setVerticalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOn
         )
