@@ -44,6 +44,16 @@ class POSApp(QWidget):
         self.inventory_layout = QVBoxLayout()
         self.inventory_tab.setLayout(self.inventory_layout)
 
+        palette = self.inventory_tab.palette()
+        palette.setColor(
+            QPalette.ColorRole.Window, QColor("#f1f1f1")
+        )  # Light background
+        palette.setColor(
+            QPalette.ColorRole.Highlight,
+            QColor("#ffc107"),
+        )  # Dark orange on hover
+        self.inventory_tab.setPalette(palette)
+
         self.scanner_input = QLineEdit(self)
         self.scanner_input.setPlaceholderText("Scan Item ID Here...")
         self.scanner_input.setStyleSheet(
@@ -55,7 +65,7 @@ class POSApp(QWidget):
 
         self.scanned_items_list = QListWidget(self)
         self.scanned_items_list.setStyleSheet(
-            "font-size: 14px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc;"
+            "font-size: 14px; padding: 10px; background-color: #ffffff; color: #333; border: 1px solid #ccc;"
         )
         self.pos_layout.addWidget(self.scanned_items_list)
 
@@ -65,7 +75,7 @@ class POSApp(QWidget):
 
         self.sell_button = QPushButton("Sell", self)
         self.sell_button.setStyleSheet(
-            "background-color: #dc3545; color: white; padding: 12px; font-size: 16px; border-radius: 5px;"
+            "background-color: #2e9e26; color: white; padding: 12px; font-size: 16px; border-radius: 5px;"
         )
         self.sell_button.clicked.connect(self.process_sale)
         self.pos_layout.addWidget(self.sell_button)
