@@ -21,6 +21,9 @@ class InventoryWidget(QWidget):
         self.barcode_input = QLineEdit(self)
         self.barcode_input.setPlaceholderText("Barcode")
         self.barcode_input.setStyleSheet(input_style)
+        self.barcode_input.returnPressed.connect(
+            self.prefill_inventory_item
+        )  # Trigger prefill on Enter key
         self.layout.addWidget(self.barcode_input)
 
         self.item_name_input = QLineEdit(self)
@@ -59,7 +62,7 @@ class InventoryWidget(QWidget):
 
     def add_inventory_item(self):
         try:
-            # Call the inventory handler to add the item
+            # Call the inventory handler to add or update the item
             self.inventory_handler.add_inventory_item(
                 str(self.barcode_input.text()),  # Ensure barcode is passed as a string
                 self.item_name_input.text(),
@@ -77,12 +80,35 @@ class InventoryWidget(QWidget):
 
             # Update button text and show success message
             self.add_inventory_button.setText("Add Item")
-            self.success_message_label.setText("Item added successfully!")
+            self.success_message_label.setText("Item added/updated successfully!")
+            self.success_message_label.setStyleSheet("color: green; font-size: 14px;")
 
         except Exception as e:
             # Handle errors (optional)
             self.success_message_label.setText(f"Error: {str(e)}")
             self.success_message_label.setStyleSheet("color: red; font-size: 14px;")
+
+    def prefill_inventory_item(self):
+        """Prefill input fields if the barcode exists in the inventory."""
+        barcode = self.barcode_input.text()
+        if barcode:
+            item = self.inventory_handler.get_inventory_item(barcode)
+            if item:
+                self.item_name_input.setText(item.get("Item Name", ""))
+                self.original_price_input.setText(str(item.get("Original Price", "")))
+                self.sale_price_input.setText(str(item.get("Sale Price", "")))
+                self.inventory_quantity_input.setText(
+                    str(item.get("Inventory Quantity", ""))
+                )
+                self.success_message_label.setText(
+                    "Item found. Fields prefilled for editing."
+                )
+                self.success_message_label.setStyleSheet(
+                    "color: green; font-size: 14px;"
+                )
+            else:
+                self.success_message_label.setText("Item not found in inventory.")
+                self.success_message_label.setStyleSheet("color: red; font-size: 14px;")
 
     def focus_barcode_input(self):
         """Set focus on the barcode input field."""
