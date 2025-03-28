@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from openpyxl import load_workbook
+from openpyxl.styles import Alignment, Font
 
 
 class InventoryHandler:
@@ -93,7 +94,12 @@ class InventoryHandler:
 
         # Insert or update data into the correct columns dynamically
         for column_name, value in data.items():
-            ws.cell(row=target_row, column=columns[column_name], value=value)
+            cell = ws.cell(row=target_row, column=columns[column_name], value=value)
+            # Apply alignment and formatting
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            if column_name in ["Original Price", "Sale Price"]:
+                cell.number_format = "#,##0.00"  # Format as currency
+            cell.font = Font(name="Calibri", size=11)
 
         # Save workbook
         wb.save(self.file_path)
