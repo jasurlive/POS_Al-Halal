@@ -24,6 +24,7 @@ class POSApp(QWidget):
         self.setWindowTitle("POS Al Halal")
         self.setGeometry(100, 100, 700, 500)
 
+        # Set application-wide palette
         palette = self.palette()
         palette.setColor(
             QPalette.ColorRole.Window, QColor("#f8f9fa")
@@ -32,95 +33,145 @@ class POSApp(QWidget):
 
         self.layout = QVBoxLayout()
         self.tabs = QTabWidget(self)
+        self.tabs.setStyleSheet(
+            """
+            QTabWidget::pane {
+                border: 1px solid #ccc;
+                background-color: #ffffff;
+            }
+            QTabBar::tab {
+                background: #007bff;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            QTabBar::tab:selected {
+                background: #0056b3;
+            }
+            QTabBar::tab:hover {
+                background: #0056b3;
+                color: #e9ecef;
+            }
+        """
+        )
         self.layout.addWidget(self.tabs)
 
+        # Point of Sale Tab
         self.pos_tab = QWidget()
         self.tabs.addTab(self.pos_tab, "Point of Sale")
         self.pos_layout = QVBoxLayout()
         self.pos_tab.setLayout(self.pos_layout)
 
+        # Inventory Tab
         self.inventory_tab = QWidget()
         self.tabs.addTab(self.inventory_tab, "Inventory")
         self.inventory_layout = QVBoxLayout()
         self.inventory_tab.setLayout(self.inventory_layout)
 
-        palette = self.inventory_tab.palette()
-        palette.setColor(
-            QPalette.ColorRole.Window, QColor("#f1f1f1")
-        )  # Light background
-        palette.setColor(
-            QPalette.ColorRole.Highlight,
-            QColor("#ffc107"),
-        )  # Dark orange on hover
-        self.inventory_tab.setPalette(palette)
-
+        # Scanner Input
         self.scanner_input = QLineEdit(self)
         self.scanner_input.setPlaceholderText("Scan Item ID Here...")
         self.scanner_input.setStyleSheet(
-            "font-size: 18px; padding: 12px; border: 2px solid #007bff; border-radius: 5px;"
+            """
+            font-size: 18px;
+            padding: 12px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #333;
+        """
         )
         self.scanner_input.setFocus()
         self.scanner_input.returnPressed.connect(self.scan_item)
         self.pos_layout.addWidget(self.scanner_input)
 
+        # Scanned Items List
         self.scanned_items_list = QListWidget(self)
         self.scanned_items_list.setStyleSheet(
-            "font-size: 14px; padding: 10px; background-color: #ffffff; color: #333; border: 1px solid #ccc;"
+            """
+            font-size: 14px;
+            padding: 10px;
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        """
         )
         self.pos_layout.addWidget(self.scanned_items_list)
 
+        # Total Price Label
         self.total_price_label = QLabel("Total Price: $0.00", self)
         self.total_price_label.setFont(QFont("Arial", 16))
+        self.total_price_label.setStyleSheet(
+            """
+            color: #28a745;
+            font-weight: bold;
+        """
+        )
         self.pos_layout.addWidget(self.total_price_label)
 
+        # Sell Button
         self.sell_button = QPushButton("Sell", self)
         self.sell_button.setStyleSheet(
-            "background-color: #2e9e26; color: white; padding: 12px; font-size: 16px; border-radius: 5px;"
+            """
+            background-color: #2e9e26;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        """
         )
         self.sell_button.clicked.connect(self.process_sale)
         self.pos_layout.addWidget(self.sell_button)
 
+        # Inventory Inputs
+        input_style = """
+            padding: 10px;
+            border: 2px solid #17a2b8;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #333;
+        """
         self.barcode_input = QLineEdit(self)
         self.barcode_input.setPlaceholderText("Barcode")
-        self.barcode_input.setStyleSheet(
-            "padding: 10px; border: 2px solid #17a2b8; border-radius: 5px;"
-        )
+        self.barcode_input.setStyleSheet(input_style)
         self.inventory_layout.addWidget(self.barcode_input)
 
         self.item_name_input = QLineEdit(self)
         self.item_name_input.setPlaceholderText("Item Name")
-        self.item_name_input.setStyleSheet(
-            "padding: 10px; border: 2px solid #17a2b8; border-radius: 5px;"
-        )
+        self.item_name_input.setStyleSheet(input_style)
         self.inventory_layout.addWidget(self.item_name_input)
 
         self.original_price_input = QLineEdit(self)
         self.original_price_input.setPlaceholderText("Original Price")
-        self.original_price_input.setStyleSheet(
-            "padding: 10px; border: 2px solid #17a2b8; border-radius: 5px;"
-        )
+        self.original_price_input.setStyleSheet(input_style)
         self.inventory_layout.addWidget(self.original_price_input)
 
         self.sale_price_input = QLineEdit(self)
         self.sale_price_input.setPlaceholderText("Sale Price")
-        self.sale_price_input.setStyleSheet(
-            "padding: 10px; border: 2px solid #17a2b8; border-radius: 5px;"
-        )
+        self.sale_price_input.setStyleSheet(input_style)
         self.inventory_layout.addWidget(self.sale_price_input)
 
         self.inventory_quantity_input = QLineEdit(self)
         self.inventory_quantity_input.setPlaceholderText("Inventory Quantity")
-        self.inventory_quantity_input.setStyleSheet(
-            "padding: 10px; border: 2px solid #17a2b8; border-radius: 5px;"
-        )
+        self.inventory_quantity_input.setStyleSheet(input_style)
         self.inventory_layout.addWidget(self.inventory_quantity_input)
 
+        # Add Inventory Button
         self.add_inventory_button = QPushButton("Add New Item", self)
         self.add_inventory_button.setStyleSheet(
-            "background-color: #ffc107; color: white; padding: 12px; font-size: 16px; border-radius: 5px;"
+            """
+            background-color: #ffc107;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        """
         )
-        self.inventory_layout.addWidget(self.add_inventory_button)
         self.add_inventory_button.clicked.connect(self.add_inventory_item)
+        self.inventory_layout.addWidget(self.add_inventory_button)
 
         self.setLayout(self.layout)
 
