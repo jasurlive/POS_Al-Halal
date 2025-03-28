@@ -87,7 +87,19 @@ class POSWidget(QWidget):
                 self.scanned_items_list.addItem("Product not found")
             self.scanner_input.clear()
 
+    def set_button_style(self, text, icon_name, background_color):
+        """Helper method to set the button's style."""
+        self.sell_button.setText(text)
+        self.sell_button.setIcon(qta.icon(icon_name))
+        self.sell_button.setStyleSheet(
+            f"background-color: {background_color}; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
+        )
+
     def process_sale(self):
+        if not self.scanned_items:
+            self.scanned_items_list.addItem("No items to sell. Add items first!")
+            return
+
         for item_name, _ in self.scanned_items:
             self.pos_handler.update_inventory(item_name)
         self.scanned_items_list.clear()
@@ -96,20 +108,12 @@ class POSWidget(QWidget):
         self.total_price_label.setText("Total Price: $0.00")
 
         # Change button to success state
-        self.sell_button.setText("Success!")
-        self.sell_button.setIcon(qta.icon("fa5s.check-circle"))  # Success icon
-        self.sell_button.setStyleSheet(
-            "background-color: #2564b6; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
-        )
+        self.set_button_style("Success!", "fa5s.check-circle", "#2564b6")
 
         # Revert button back to sell state after 3 seconds
         QTimer.singleShot(3000, self.reset_sell_button)
         self.focus_barcode_input()  # Set focus back to the barcode input field
 
     def reset_sell_button(self):
-        """Reset the sell button to its original state."""
-        self.sell_button.setText(" Sell all!")
-        self.sell_button.setIcon(qta.icon("fa5s.money-bill-wave"))  # Original icon
-        self.sell_button.setStyleSheet(
-            "background-color: #269e62; color: white; padding: 12px; font-size: 16px; border-radius: 5px; border: none;"
-        )
+        """Reset the sell button to its default state."""
+        self.set_button_style(" Sell", "fa5s.money-bill-wave", "#2e9e26")
