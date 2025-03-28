@@ -1,6 +1,5 @@
-# gui.py - Handles UI Setup
-
 import sys
+import qtawesome as qta
 from PyQt6.QtWidgets import (
     QApplication,
     QWidget,
@@ -11,7 +10,7 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QListWidget,
 )
-from PyQt6.QtGui import QFont, QPalette, QColor
+from PyQt6.QtGui import QFont, QPalette, QColor, QIcon
 from PyQt6.QtCore import QTimer
 from pos import POSHandler
 from inventory import InventoryHandler
@@ -56,15 +55,15 @@ class POSApp(QWidget):
         )
         self.layout.addWidget(self.tabs)
 
-        # Point of Sale Tab
+        # Point of Sale Tab (with Icon)
         self.pos_tab = QWidget()
-        self.tabs.addTab(self.pos_tab, "Point of Sale")
+        self.tabs.addTab(self.pos_tab, qta.icon("fa5s.shopping-cart"), " Point of Sale")
         self.pos_layout = QVBoxLayout()
         self.pos_tab.setLayout(self.pos_layout)
 
-        # Inventory Tab
+        # Inventory Tab (with Icon)
         self.inventory_tab = QWidget()
-        self.tabs.addTab(self.inventory_tab, "Inventory")
+        self.tabs.addTab(self.inventory_tab, qta.icon("fa5s.box-open"), " Inventory")
         self.inventory_layout = QVBoxLayout()
         self.inventory_tab.setLayout(self.inventory_layout)
 
@@ -110,8 +109,10 @@ class POSApp(QWidget):
         )
         self.pos_layout.addWidget(self.total_price_label)
 
-        # Sell Button
-        self.sell_button = QPushButton("Sell", self)
+        # Sell Button (with Icon)
+        self.sell_button = QPushButton(self)
+        self.sell_button.setText(" Sell")
+        self.sell_button.setIcon(qta.icon("fa5s.money-bill-wave"))
         self.sell_button.setStyleSheet(
             """
             background-color: #2e9e26;
@@ -158,8 +159,10 @@ class POSApp(QWidget):
         self.inventory_quantity_input.setStyleSheet(input_style)
         self.inventory_layout.addWidget(self.inventory_quantity_input)
 
-        # Add Inventory Button
-        self.add_inventory_button = QPushButton("Add New Item", self)
+        # Add Inventory Button (with Icon)
+        self.add_inventory_button = QPushButton(self)
+        self.add_inventory_button.setText(" Add New Item")
+        self.add_inventory_button.setIcon(qta.icon("fa5s.plus-circle"))
         self.add_inventory_button.setStyleSheet(
             """
             background-color: #ffc107;
@@ -229,3 +232,10 @@ class POSApp(QWidget):
             self.sale_price_input.text(),
             self.inventory_quantity_input.text(),
         )
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = POSApp()
+    window.show()
+    sys.exit(app.exec())
