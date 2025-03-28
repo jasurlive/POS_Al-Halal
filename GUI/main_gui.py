@@ -1,9 +1,10 @@
+import sys
 import qtawesome as qta
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
+from PyQt6.QtGui import QPalette, QColor, QIcon
+from PyQt6.QtCore import Qt
 from GUI.POS import POSWidget
 from GUI.inv import InventoryWidget
-
-from PyQt6.QtGui import QFont, QPalette, QColor, QIcon, QPixmap
 
 
 class MainApp(QWidget):
@@ -22,10 +23,26 @@ class MainApp(QWidget):
         icon_pixmap = qta.icon("fa5s.shopping-cart").pixmap(64, 64)
         self.setWindowIcon(QIcon(icon_pixmap))
 
-        self.layout = QVBoxLayout(self)
+        # Main Layout
+        self.main_layout = QVBoxLayout(self)
+
+        # Create Tabs
         self.tabs = QTabWidget(self)
 
-        # Apply styling
+        # Add POS and Inventory tabs
+        self.pos_widget = POSWidget()
+        self.inventory_widget = InventoryWidget()
+
+        self.tabs.addTab(
+            self.pos_widget, qta.icon("fa5s.shopping-cart"), " Point of Sale"
+        )
+        self.tabs.addTab(self.inventory_widget, qta.icon("fa5s.box-open"), " Inventory")
+
+        # Add Refresh Tab (Dummy Empty Widget)
+        self.refresh_tab = QWidget()  # Empty widget since we just need the tab itself
+        self.tabs.addTab(self.refresh_tab, qta.icon("fa5s.sync-alt"), " Refresh")
+
+        # Styling for Tabs
         self.tabs.setStyleSheet(
             """
             QTabWidget::pane {
@@ -48,27 +65,41 @@ class MainApp(QWidget):
         """
         )
 
-        # Add POS and Inventory tabs
-        self.pos_widget = POSWidget()
-        self.inventory_widget = InventoryWidget()
-
-        self.tabs.addTab(
-            self.pos_widget, qta.icon("fa5s.shopping-cart"), " Point of Sale"
-        )
-        self.tabs.addTab(self.inventory_widget, qta.icon("fa5s.box-open"), " Inventory")
-
-        self.layout.addWidget(self.tabs)
-        self.setLayout(self.layout)
+        # Add Tabs to Layout
+        self.main_layout.addWidget(self.tabs)
 
         # Set default focus on POS tab's barcode input
         self.pos_widget.focus_barcode_input()
 
-        # Connect tab change event to focus logic
+        # Connect tab change event to override refresh tab behavior
         self.tabs.currentChanged.connect(self.handle_tab_change)
 
+        self.previous_tab_index = 0  # Track the previously active tab index
+
     def handle_tab_change(self, index):
-        """Handle tab change to set focus on the appropriate barcode input."""
-        if index == 0:  # POS tab
-            self.pos_widget.focus_barcode_input()
-        elif index == 1:  # Inventory tab
-            self.inventory_widget.focus_barcode_input()
+        """Handle tab change. If Refresh tab is clicked, refresh inputs and stay on the current tab."""
+        if index == 2:  # Refresh tab
+            self.clear_inputs()
+            self.tabs.setCurrentIndex(
+                self.previous_tab_index
+            )  # Return to the previous tab
+        else:
+            self.previous_tab_index = index  # Update the previous tab index
+            if index == 0:  # POS tab
+                self.pos_widget.focus_barcode_input()
+            elif index == 1:  # Inventory tab
+                self.inventory_widget.focus_barcode_input()
+
+    def clear_inputs(self):
+        """Clear all input fields in POS and Inventory tabs."""
+        self.pos_widget.clear_inputs()
+        self.inventory_widget.clear_inputs()
+
+
+if __name__ == "__main__":
+    from PyQt6.QtWidgets import QApplication
+
+    app = QApplication(sys.argv)
+    window = MainApp()
+    window.show()
+    sys.exit(app.exec())

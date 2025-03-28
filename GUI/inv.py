@@ -72,11 +72,7 @@ class InventoryWidget(QWidget):
             )
 
             # Clear input fields
-            self.barcode_input.clear()
-            self.item_name_input.clear()
-            self.original_price_input.clear()
-            self.sale_price_input.clear()
-            self.inventory_quantity_input.clear()
+            self.clear_inputs()
 
             # Update button text and show success message
             self.add_inventory_button.setText("Add Item")
@@ -113,3 +109,12 @@ class InventoryWidget(QWidget):
     def focus_barcode_input(self):
         """Set focus on the barcode input field."""
         self.barcode_input.setFocus()
+
+    def clear_inputs(self):
+        """Clear all input fields."""
+        self.barcode_input.clear()
+        self.item_name_input.clear()
+        self.original_price_input.clear()
+        self.sale_price_input.clear()
+        self.inventory_quantity_input.clear()
+        self.success_message_label.clear()
