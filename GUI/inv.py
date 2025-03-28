@@ -1,5 +1,5 @@
 import qtawesome as qta
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLineEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLineEdit, QLabel
 from inventory import InventoryHandler
 
 
@@ -52,14 +52,37 @@ class InventoryWidget(QWidget):
         self.add_inventory_button.clicked.connect(self.add_inventory_item)
         self.layout.addWidget(self.add_inventory_button)
 
+        # Success message label
+        self.success_message_label = QLabel("", self)
+        self.success_message_label.setStyleSheet("color: green; font-size: 14px;")
+        self.layout.addWidget(self.success_message_label)
+
     def add_inventory_item(self):
-        self.inventory_handler.add_inventory_item(
-            self.item_name_input.text(),
-            self.barcode_input.text(),
-            self.original_price_input.text(),
-            self.sale_price_input.text(),
-            self.inventory_quantity_input.text(),
-        )
+        try:
+            # Call the inventory handler to add the item
+            self.inventory_handler.add_inventory_item(
+                str(self.barcode_input.text()),  # Ensure barcode is passed as a string
+                self.item_name_input.text(),
+                self.original_price_input.text(),
+                self.sale_price_input.text(),
+                self.inventory_quantity_input.text(),
+            )
+
+            # Clear input fields
+            self.barcode_input.clear()
+            self.item_name_input.clear()
+            self.original_price_input.clear()
+            self.sale_price_input.clear()
+            self.inventory_quantity_input.clear()
+
+            # Update button text and show success message
+            self.add_inventory_button.setText("Add Item")
+            self.success_message_label.setText("Item added successfully!")
+
+        except Exception as e:
+            # Handle errors (optional)
+            self.success_message_label.setText(f"Error: {str(e)}")
+            self.success_message_label.setStyleSheet("color: red; font-size: 14px;")
 
     def focus_barcode_input(self):
         """Set focus on the barcode input field."""

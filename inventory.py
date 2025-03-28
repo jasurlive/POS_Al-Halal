@@ -40,7 +40,12 @@ class InventoryHandler:
         return ws.max_row + 1  # If no empty row found, append at the end
 
     def add_inventory_item(
-        self, barcode, item_name, original_price, sale_price, inventory_quantity
+        self,
+        barcode,
+        item_name,
+        original_price,
+        sale_price,
+        inventory_quantity,
     ):
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"Excel file not found: {self.file_path}")
@@ -54,16 +59,18 @@ class InventoryHandler:
         # Find the first empty row in "Barcode" column
         empty_row = self.find_first_empty_row(ws, columns["Barcode"])
 
+        # Prepare data to insert
+        data = {
+            "Barcode": str(barcode),  # Ensure barcode is saved as a string
+            "Item Name": item_name,
+            "Inventory Quantity": inventory_quantity,
+            "Original Price": original_price,
+            "Sale Price": sale_price,
+        }
+
         # Insert data into the correct columns dynamically
-        ws.cell(row=empty_row, column=columns["Barcode"], value=barcode)
-        ws.cell(row=empty_row, column=columns["Item Name"], value=item_name)
-        ws.cell(
-            row=empty_row,
-            column=columns["Inventory Quantity"],
-            value=inventory_quantity,
-        )
-        ws.cell(row=empty_row, column=columns["Original Price"], value=original_price)
-        ws.cell(row=empty_row, column=columns["Sale Price"], value=sale_price)
+        for column_name, value in data.items():
+            ws.cell(row=empty_row, column=columns[column_name], value=value)
 
         # Save workbook
         wb.save(self.file_path)
