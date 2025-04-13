@@ -1,0 +1,6 @@
+quantity left needs to be shown on the main screen;
+manual enter for meat on the main screen;
+separate datasheet for business sale;
+
+what if the price changes during some period;
+discount excel sheet;
